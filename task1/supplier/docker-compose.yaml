@@ -1,0 +1,21 @@
+services:
+  postgres:
+    container_name: postgres_consumer
+    image: postgres
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: supplier
+      POSTGRES_PASSWORD: supplier
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - "2345:5432"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+
+volumes:
+  db:
