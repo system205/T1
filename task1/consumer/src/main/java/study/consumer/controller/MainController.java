@@ -10,7 +10,6 @@ import study.consumer.dto.Category;
 import study.consumer.dto.Product;
 import study.consumer.dto.ProductsCategories;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
