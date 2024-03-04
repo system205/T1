@@ -5,14 +5,18 @@ import org.springframework.web.bind.annotation.*;
 import study.supplier.entity.Category;
 import study.supplier.repository.CategoryRepository;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
 public class CategoriesController {
     private final CategoryRepository categoryRepository;
+
     @PostMapping
     public Category createCategory(@RequestBody Category category) {
-        return categoryRepository.save(category);
+        final Optional<Category> optionalCategory = categoryRepository.findByName(category.getName());
+        return optionalCategory.orElseGet(() -> categoryRepository.save(category));
     }
 
     @GetMapping
