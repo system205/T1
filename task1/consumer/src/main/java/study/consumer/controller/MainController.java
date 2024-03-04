@@ -1,20 +1,24 @@
 package study.consumer.controller;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import study.consumer.dto.Category;
 import study.consumer.dto.Product;
 import study.consumer.dto.ProductsCategories;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @RestController
@@ -62,8 +66,8 @@ public class MainController {
         @RequestParam(defaultValue = "") String descriptionContains,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Request: minPrice={}, maxPrice={}, category={}, nameContains={}, descriptionContains={}",
-            minPrice, maxPrice, category, nameContains, descriptionContains);
+        log.info("Request: minPrice={}, maxPrice={}, category={}, nameContains={}, descriptionContains={}, page={}, size={}",
+            minPrice, maxPrice, category, nameContains, descriptionContains, page, size);
 
         final Product[] products = Objects.requireNonNull(
             restTemplate.getForObject(url + "/products", Product[].class)
@@ -96,7 +100,7 @@ public class MainController {
     }
 
     @PostMapping("/products")
-    public Product createProduct(@RequestBody Product product) {
+    public Product createProduct(@RequestBody @Valid Product product) {
         if (product.getCategory() != null) // Make sure to have the category
             product.setCategory(restTemplate.postForObject(url + "/categories", product.getCategory(), Category.class));
         return restTemplate.postForObject(url + "/products", product, Product.class);
@@ -104,7 +108,7 @@ public class MainController {
 
     @PutMapping("/products/{id}")
     public void updateProduct(@PathVariable Long id,
-                              @RequestBody Product product) {
+                              @RequestBody @Valid Product product) {
         restTemplate.put(url + "/products/" + id, product);
     }
 
@@ -112,4 +116,34 @@ public class MainController {
     public void deleteProduct(@PathVariable Long id) {
         restTemplate.delete(url + "/products/" + id);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(
+            error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public Map<String, String> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put(ex.getName(), "Check that you specified this parameter correctly");
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Map<String, String> handleNotReadableMessage(HttpMessageNotReadableException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", "Check that you specified the parameters in body correctly");
+        return errors;
+    }
+
 }
