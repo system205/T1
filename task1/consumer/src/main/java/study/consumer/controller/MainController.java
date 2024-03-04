@@ -12,6 +12,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import study.consumer.dto.Category;
@@ -146,4 +148,19 @@ public class MainController {
         return errors;
     }
 
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(ResourceAccessException.class)
+    public Map<String, String> handleResourceAccessException(ResourceAccessException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", "Supplier service is not available. Try later.");
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(RestClientException.class)
+    public Map<String, String> handleRestClientException(RestClientException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", "Supplier service is not working properly. Try later.");
+        return errors;
+    }
 }
