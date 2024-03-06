@@ -43,4 +43,9 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<modules>
+		<module>supplier</module>
+		<module>consumer</module>
+	</modules>
 </project>

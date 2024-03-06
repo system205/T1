@@ -1,0 +1,37 @@
+services:
+  postgres:
+    container_name: postgres_consumer
+    image: postgres
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: supplier
+      POSTGRES_PASSWORD: supplier
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - "2345:5432"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+  supplier:
+    build:
+        context: ./
+        dockerfile: ./supplier/Dockerfile
+    container_name: supplier
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db
+  consumer:
+    build:
+      context: ./
+      dockerfile: ./consumer/Dockerfile
+    container_name: consumer
+    environment:
+      - SUPPLIER_URL=http://supplier:8080/api/v1
+    ports:
+      - "80:8081"
+
+volumes:
+  db:
