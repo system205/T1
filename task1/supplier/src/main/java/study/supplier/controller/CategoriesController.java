@@ -1,6 +1,8 @@
 package study.supplier.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.supplier.entity.Category;
 import study.supplier.repository.CategoryRepository;
@@ -14,29 +16,31 @@ public class CategoriesController {
     private final CategoryRepository categoryRepository;
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
+    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
         final Optional<Category> optionalCategory = categoryRepository.findByName(category.getName());
-        return optionalCategory.orElseGet(() -> categoryRepository.save(category));
+        return optionalCategory.map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.CREATED).body(categoryRepository.save(category)));
     }
 
     @GetMapping
-    public Iterable<Category> getCategories() {
-        return categoryRepository.findAll();
+    public ResponseEntity<Iterable<Category>> getCategories() {
+        return ResponseEntity.ok(categoryRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id) {
-        return categoryRepository.findById(id).orElse(null);
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryRepository.findById(id).orElse(null));
     }
 
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
         category.setId(id);
-        return categoryRepository.save(category);
+        return ResponseEntity.ok(categoryRepository.save(category));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
