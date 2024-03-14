@@ -42,7 +42,7 @@ public class MainController {
     }
 
     @GetMapping
-    public ProductsCategories getProductsCategories() {
+    public ResponseEntity<ProductsCategories> getProductsCategories() {
         final Product[] products = Objects.requireNonNull(
             restTemplate.getForObject(url + "/products", Product[].class));
         final Category[] categories = Objects.requireNonNull(
@@ -51,7 +51,7 @@ public class MainController {
         log.info("Number of products: {}", products.length);
         log.info("Number of categories: {}", categories.length);
 
-        return new ProductsCategories(List.of(products), List.of(categories));
+        return ResponseEntity.ok(new ProductsCategories(List.of(products), List.of(categories)));
     }
 
     @GetMapping("/products")
@@ -69,17 +69,17 @@ public class MainController {
         final Paged<List<Product>> pagedFilteredProducts =
             restTemplate.exchange(
                 """
-                %s/products?page=%d\
-                &size=%d\
-                &minPrice=%f\
-                &maxPrice=%f\
-                &category=%s\
-                &nameContains=%s\
-                &descContains=%s""".formatted(url, page, size,
+                    %s/products?page=%d\
+                    &size=%d\
+                    &minPrice=%f\
+                    &maxPrice=%f\
+                    &category=%s\
+                    &nameContains=%s\
+                    &descContains=%s""".formatted(url, page, size,
                     minPrice, maxPrice,
                     category, nameContains,
                     descriptionContains), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Paged<List<Product>>>() {
-            }).getBody();
+                }).getBody();
         assert pagedFilteredProducts != null;
 
         final List<Product> products = pagedFilteredProducts.content();
@@ -95,21 +95,24 @@ public class MainController {
     }
 
     @PostMapping("/products")
-    public Product createProduct(@RequestBody @Valid Product product) {
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid Product product) {
         if (product.getCategory() != null) // Make sure to have the category
             product.setCategory(restTemplate.postForObject(url + "/categories", product.getCategory(), Category.class));
-        return restTemplate.postForObject(url + "/products", product, Product.class);
+        final Product postedProduct = restTemplate.postForObject(url + "/products", product, Product.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(postedProduct);
     }
 
     @PutMapping("/products/{id}")
-    public void updateProduct(@PathVariable Long id,
-                              @RequestBody @Valid Product product) {
+    public ResponseEntity<Void> updateProduct(@PathVariable Long id,
+                                              @RequestBody @Valid Product product) {
         restTemplate.put(url + "/products/" + id, product);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/products/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         restTemplate.delete(url + "/products/" + id);
+        return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
