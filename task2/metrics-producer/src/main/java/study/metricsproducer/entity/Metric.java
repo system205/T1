@@ -1,4 +1,4 @@
 package study.metricsproducer.entity;
 
-public record Metric(String name, Object value) {
+public record Metric(String tag, Object value) {
 }
