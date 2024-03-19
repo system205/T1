@@ -14,7 +14,7 @@ import study.metricsproducer.services.MetricsService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/metrics")
+@RequestMapping("/api/v1/metrics")
 @RequiredArgsConstructor
 @Slf4j
 public class MetricsController {

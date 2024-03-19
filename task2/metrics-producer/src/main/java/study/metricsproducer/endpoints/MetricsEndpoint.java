@@ -9,7 +9,7 @@ import study.metricsproducer.entity.Metric;
 import study.metricsproducer.services.MetricsService;
 
 @WebEndpoint(id = "custom-metrics")
-@Component
+@Component("customMetricsEndpoint")
 @RequiredArgsConstructor
 public class MetricsEndpoint {
     private final MetricsService service;
