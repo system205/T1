@@ -3,13 +3,12 @@ package study.metricsproducer.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import study.metricsproducer.entity.Metric;
-import study.metricsproducer.services.MetricsService;
+import study.metricsproducer.service.AppObserverService;
 
 import java.util.List;
 
@@ -18,19 +17,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MetricsController {
-    private final KafkaTemplate<String, Metric> kafkaTemplate;
-    private final MetricsService service;
-
+    private final AppObserverService service;
     @PostMapping
     public ResponseEntity<Void> test(@RequestBody List<Metric> metrics) {
-        for (Metric metric : metrics) {
-            service.saveMetric(metric);
-            kafkaTemplate.send("metrics-topic", metric)
-                .thenAccept(result -> {
-                    final var sentMetric = result.getProducerRecord().value();
-                    log.info("Metric {}:{} is successfully sent to Kafka", sentMetric.tag(), sentMetric.value());
-                });
-        }
+        metrics.forEach(service::sendMetric);
         return ResponseEntity.accepted().build();
     }
 }
