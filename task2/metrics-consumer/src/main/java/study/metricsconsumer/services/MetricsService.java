@@ -5,10 +5,9 @@ import org.springframework.stereotype.Service;
 import study.metricsconsumer.entity.Metric;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.StreamSupport;
 
 @Service
 @Getter
@@ -17,6 +16,9 @@ public class MetricsService {
 
     public Iterable<Metric> getMetricMeasurements(String tag, Instant from, Instant to) {
         List<Metric> timedMetrics = new ArrayList<>();
+        if (!metrics.containsKey(tag)) {
+            return Collections.emptyList();
+        }
         for (Metric metric : metrics.get(tag)) {
             if (metric.getTimestamp().isBefore(from) || metric.getTimestamp().isAfter(to)) continue;
             timedMetrics.add(metric);
@@ -26,18 +28,18 @@ public class MetricsService {
 
     /**
      * @return last measurements for all metrics
-     * */
+     */
     public Iterable<Metric> getAllMetrics() {
         List<Metric> lastMetrics = new ArrayList<>();
         for (var m : metrics.entrySet()) {
-            lastMetrics.add(m.getValue().get(m.getValue().size()-1));
+            lastMetrics.add(m.getValue().get(m.getValue().size() - 1));
         }
         return lastMetrics;
     }
 
     /**
      * Saves a metric measurement
-     * */
+     */
     public void saveMetric(Metric metric) {
         List<Metric> initList = new ArrayList<>(1);
         initList.add(metric);
@@ -45,6 +47,12 @@ public class MetricsService {
             o.addAll(n);
             return o;
         });
+    }
+
+    public DoubleSummaryStatistics getMetricStatistics(Iterable<Metric> measurements) {
+        return StreamSupport.stream(measurements.spliterator(), true)
+            .mapToDouble(Metric::getValue)
+            .summaryStatistics();
     }
 
 
