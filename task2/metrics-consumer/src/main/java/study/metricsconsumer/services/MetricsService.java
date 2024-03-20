@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 import study.metricsconsumer.entity.Metric;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MetricsService {
     private final Map<String, List<Metric>> metrics = new ConcurrentHashMap<>();
 
-    public Iterable<Metric> getMetricMeasurements(String tag) {
-        return metrics.get(tag);
+    public Iterable<Metric> getMetricMeasurements(String tag, Instant from, Instant to) {
+        List<Metric> timedMetrics = new ArrayList<>();
+        for (Metric metric : metrics.get(tag)) {
+            if (metric.getTimestamp().isBefore(from) || metric.getTimestamp().isAfter(to)) continue;
+            timedMetrics.add(metric);
+        }
+        return timedMetrics;
     }
 
     /**
