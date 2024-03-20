@@ -1,5 +1,13 @@
 package study.metricsconsumer.entity;
 
-public record Metric(String tag, Object value) {
+import lombok.Data;
 
+import java.time.Instant;
+
+@Data
+public class Metric {
+
+    private String tag;
+    private Double value;
+    private Instant timestamp;
 }
