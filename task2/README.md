@@ -13,6 +13,7 @@ Make sure you have the following properties in the modules:
 [Producer properties](/task2/metrics-producer/src/main/resources/application.properties):
 - spring.kafka.bootstrap-servers=http://localhost:9092
 - server.port=8081
+- management.endpoints.web.exposure.include=metrics - this is **necessary** to include the [MetricsEndpoint](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/metrics/MetricsEndpoint.html) in the actuator.
 
 2. Run the [MetricsProducerApplication](/task2/metrics-producer/src/main/java/com/epam/metrics/MetricsProducerApplication.java) 
 and [MetricsConsumerApplication](/task2/metrics-consumer/src/main/java/com/epam/metrics/MetricsConsumerApplication.java) modules with the following commands:
