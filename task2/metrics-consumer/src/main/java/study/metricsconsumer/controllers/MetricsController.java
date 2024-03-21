@@ -1,5 +1,11 @@
 package study.metricsconsumer.controllers;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,25 +23,55 @@ import java.util.DoubleSummaryStatistics;
 public class MetricsController {
     private final MetricsService service;
 
+    @ApiResponse(responseCode = "200", description = "Last measurements for all metrics",
+        content = @Content(mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = Metric.class))
+        ))
     @GetMapping
     public ResponseEntity<Iterable<Metric>> getMetrics() {
         return ResponseEntity.ok(service.getAllMetrics());
     }
 
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Measurements for the metric",
+            content = @Content(mediaType = "application/json",
+                array = @ArraySchema(schema = @Schema(implementation = Metric.class))
+            )),
+        @ApiResponse(responseCode = "404", description = "Metric not found", content = @Content(schema = @Schema(implementation = Void.class)))
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Iterable<Metric>> getMetric(@PathVariable("id") String tag,
+    public ResponseEntity<Iterable<Metric>> getMetric(@Parameter(description = "tag or name of the metric")
+                                                      @PathVariable("id") String tag,
+                                                      @Parameter(description = "timestamp to return measurements from")
                                                       @RequestParam(defaultValue = "1") Long from,
+                                                      @Parameter(description = "timestamp to return measurement up to")
                                                       @RequestParam(defaultValue = "99999999999999") Long to) {
+        if (!service.isMetricExists(tag))
+            return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok(service.getMetricMeasurements(tag,
             Instant.ofEpochMilli(from),
             Instant.ofEpochMilli(to)
         ));
     }
 
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Some statistics for the metric",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = DoubleSummaryStatistics.class)
+            )),
+        @ApiResponse(responseCode = "404", description = "Metric not found", content = @Content(schema = @Schema(implementation = Void.class)))
+    })
     @GetMapping("/{id}/stats")
-    public ResponseEntity<DoubleSummaryStatistics> getMetricStatistics(@PathVariable("id") String tag,
+    public ResponseEntity<DoubleSummaryStatistics> getMetricStatistics(@Parameter(description = "tag or name of the metric")
+                                                                           @PathVariable("id") String tag,
+                                                                       @Parameter(description = "timestamp to return measurements from")
                                                                        @RequestParam(defaultValue = "1") Long from,
-                                                                       @RequestParam(defaultValue = "99999999999999") Long to) {
+                                                                       @Parameter(description = "timestamp to return measurement up to")
+                                                                           @RequestParam(defaultValue = "99999999999999") Long to) {
+        if (!service.isMetricExists(tag))
+            return ResponseEntity.notFound().build();
+
         final Iterable<Metric> metricMeasurements = service.getMetricMeasurements(tag,
             Instant.ofEpochMilli(from),
             Instant.ofEpochMilli(to)

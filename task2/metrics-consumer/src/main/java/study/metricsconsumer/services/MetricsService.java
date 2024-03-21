@@ -55,5 +55,7 @@ public class MetricsService {
             .summaryStatistics();
     }
 
-
+    public boolean isMetricExists(String tag) {
+        return metrics.containsKey(tag);
+    }
 }

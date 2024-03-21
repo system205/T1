@@ -1,5 +1,8 @@
 package study.metricsproducer.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,11 @@ import java.util.List;
 @Slf4j
 public class MetricsController {
     private final AppObserverService service;
+
+    @Operation(summary = "Send metrics to Kafka")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "202", description = "Accepted for sending")
+    })
     @PostMapping
     public ResponseEntity<Void> test(@RequestBody List<Metric> metrics) {
         metrics.forEach(service::sendMetric);
