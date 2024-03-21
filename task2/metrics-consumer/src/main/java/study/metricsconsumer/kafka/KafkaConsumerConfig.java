@@ -15,6 +15,9 @@ import study.metricsconsumer.entity.Metric;
 
 import java.util.Map;
 
+/**
+ * Configuration to connect to Kafka broker as a consumer
+ * */
 @EnableKafka
 @Configuration
 @Slf4j

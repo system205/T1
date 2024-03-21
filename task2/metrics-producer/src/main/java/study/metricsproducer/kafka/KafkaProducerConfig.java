@@ -14,10 +14,14 @@ import study.metricsproducer.entity.Metric;
 
 import java.util.Map;
 
+/**
+ * Configuration to connect to Kafka broker as a producer
+ * */
 @Configuration
 public class KafkaProducerConfig {
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
+
     @Bean
     public ProducerFactory<String, Metric> producerFactory() {
         return new DefaultKafkaProducerFactory<>(Map.of(
@@ -28,12 +32,14 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, Metric> kafkaTemplate(){
+    public KafkaTemplate<String, Metric> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     @Bean
-    public NewTopic metricsTopic(){
+    public NewTopic metricsTopic() {
         return new NewTopic("metrics-topic", 1, (short) 1);
     }
 }
+
+

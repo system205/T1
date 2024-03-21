@@ -23,6 +23,9 @@ public class AppObserverService {
     @Value("${observed.metrics}")
     private List<String> observedMetrics;
 
+    /**
+     * Scheduled with cron method to observe application metrics
+     * */
     @Scheduled(cron = "*/5 * * * * *")
     public void observeApp() {
         log.info("Start metrics collection");
@@ -35,6 +38,10 @@ public class AppObserverService {
         metrics.forEach(this::sendMetric);
     }
 
+    /**
+     * Sends metric to Kafka and logs when successfully sent
+     * @param metric to send to Kafka
+     * */
     public void sendMetric(Metric metric) {
         kafkaTemplate.send("metrics-topic", metric)
             .whenComplete((result, err) -> {

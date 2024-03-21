@@ -14,6 +14,12 @@ import java.util.stream.StreamSupport;
 public class MetricsService {
     private final Map<String, List<Metric>> metrics = new ConcurrentHashMap<>();
 
+    /**
+     * @param tag  tag or name of the metric
+     * @param from timestamp to return measurements from
+     * @param to   timestamp to return measurement up to
+     * @return measurements for the metric within the time range
+     */
     public Iterable<Metric> getMetricMeasurements(String tag, Instant from, Instant to) {
         List<Metric> timedMetrics = new ArrayList<>();
         if (!metrics.containsKey(tag)) {

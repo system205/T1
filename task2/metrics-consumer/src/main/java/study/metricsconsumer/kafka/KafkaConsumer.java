@@ -11,6 +11,9 @@ import study.metricsconsumer.services.MetricsService;
 
 import java.time.Instant;
 
+/**
+ * Kafka consumer to consume metrics from Kafka topic and pass them to the service
+ * */
 @Component
 @Slf4j
 @RequiredArgsConstructor

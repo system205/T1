@@ -27,7 +27,7 @@ public class MetricsController {
         @ApiResponse(responseCode = "202", description = "Accepted for sending")
     })
     @PostMapping
-    public ResponseEntity<Void> test(@RequestBody List<Metric> metrics) {
+    public ResponseEntity<Void> takeMetrics(@RequestBody List<Metric> metrics) {
         metrics.forEach(service::sendMetric);
         return ResponseEntity.accepted().build();
     }

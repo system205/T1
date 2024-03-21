@@ -64,11 +64,11 @@ public class MetricsController {
     })
     @GetMapping("/{id}/stats")
     public ResponseEntity<DoubleSummaryStatistics> getMetricStatistics(@Parameter(description = "tag or name of the metric")
-                                                                           @PathVariable("id") String tag,
+                                                                       @PathVariable("id") String tag,
                                                                        @Parameter(description = "timestamp to return measurements from")
                                                                        @RequestParam(defaultValue = "1") Long from,
                                                                        @Parameter(description = "timestamp to return measurement up to")
-                                                                           @RequestParam(defaultValue = "99999999999999") Long to) {
+                                                                       @RequestParam(defaultValue = "99999999999999") Long to) {
         if (!service.isMetricExists(tag))
             return ResponseEntity.notFound().build();
 
