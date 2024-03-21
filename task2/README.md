@@ -37,3 +37,16 @@ Optionally you can add 'from' and 'to' query parameters as long values to filter
 
 ## POST
 - /metrics **➡** take an array of Metric objects **➡** the producer will publish the metrics to the Kafka topic.
+  - Body example:
+  ```json
+  [
+    {
+      "tag": "process.cpu.usage",
+      "value": 67.0
+    },
+    {
+      "tag": "jvm.memory.used",
+      "value": 1234E2
+    }
+  ]
+  ```
