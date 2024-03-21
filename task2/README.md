@@ -7,15 +7,15 @@ docker compose up
 
 Make sure you have the following properties in the modules:
 
-[Consumer properties](/task1/metrics-consumer/src/main/resources/application.properties):
+[Consumer properties](/task2/metrics-consumer/src/main/resources/application.properties):
 - spring.kafka.bootstrap-servers=http://localhost:9092
 
-[Producer properties](/task1/metrics-producer/src/main/resources/application.properties):
+[Producer properties](/task2/metrics-producer/src/main/resources/application.properties):
 - spring.kafka.bootstrap-servers=http://localhost:9092
 - server.port=8081
 
-2. Run the [MetricsProducerApplication](/task1/metrics-producer/src/main/java/com/epam/metrics/MetricsProducerApplication.java) 
-and [MetricsConsumerApplication](/task1/metrics-consumer/src/main/java/com/epam/metrics/MetricsConsumerApplication.java) modules with the following commands:
+2. Run the [MetricsProducerApplication](/task2/metrics-producer/src/main/java/com/epam/metrics/MetricsProducerApplication.java) 
+and [MetricsConsumerApplication](/task2/metrics-consumer/src/main/java/com/epam/metrics/MetricsConsumerApplication.java) modules with the following commands:
 - Producer:
 ```bash
 cd metrics-producer
