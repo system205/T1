@@ -2,6 +2,7 @@ package study.metricsproducer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,7 +19,9 @@ import java.util.List;
 public class AppObserverService {
     private final KafkaTemplate<String, Metric> kafkaTemplate;
     private final MetricsEndpoint metricsEndpoint;
-    private final List<String> observedMetrics = List.of("jvm.memory.used", "process.cpu.usage");
+
+    @Value("${observed.metrics}")
+    private List<String> observedMetrics;
 
     @Scheduled(cron = "*/5 * * * * *")
     public void observeApp() {
