@@ -1,3 +1,17 @@
+# Description
+
+- Producer: 
+  - It observes and sends app metrics to a Kafka topic 'metrics-topic'
+  - Accepts a list of metrics in POST to send them to the Kafka topic 
+- Consumer:
+  - It listens to the Kafka topic 'metrics-topic', logs and stores the metrics in a cache
+  - It provides a REST API to get the metric(s) measurements filtering by timestamp
+  - It can produce a summary for a metric
+- Single Kafka instance (controller and broker):
+  - It is used to communicate between the producer and the consumer
+  - It is started with docker compose, and it is available at localhost:9092 (while controller is on localhost:9093)
+  - The topic 'metrics-topic' is created automatically when a producer or a consumer will subscribe to it
+
 # Set up
 
 1. Start a Kafka broker on localhost:9092 with 
