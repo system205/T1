@@ -1,20 +1,37 @@
 # Description
 
-- Producer: 
-  - It observes and sends app metrics to a Kafka topic 'metrics-topic'
-  - Accepts a list of metrics in POST to send them to the Kafka topic 
+- Producer:
+    - It observes and sends app metrics to a Kafka topic 'metrics-topic'
+    - Accepts a list of metrics in POST to send them to the Kafka topic
 - Consumer:
-  - It listens to the Kafka topic 'metrics-topic', logs and stores the metrics in a cache
-  - It provides a REST API to get the metric(s) measurements filtering by timestamp
-  - It can produce a summary for a metric
+    - It listens to the Kafka topic 'metrics-topic', logs and stores the metrics in a cache
+    - It provides a REST API to get the metric(s) measurements filtering by timestamp
+    - It can produce a summary for a metric
 - Single Kafka instance (controller and broker):
-  - It is used to communicate between the producer and the consumer
-  - It is started with docker compose, and it is available at localhost:9092 (while controller is on localhost:9093)
-  - The topic 'metrics-topic' is created automatically when a producer or a consumer will subscribe to it
+    - It is used to communicate between the producer and the consumer
+    - It is started with docker compose, and it is available at localhost:9092 (while controller is on localhost:9093)
+    - The topic 'metrics-topic' is created automatically when a producer or a consumer will subscribe to it
+
+## Security
+
+The producer can be secured by tweaking the property ```app.security.enabled``` to ```true```.
+In this case the following will be integrated with bean securityFilterChain
+in [WebSecurityConfig](task2/metrics-producer/src/main/java/study/metricsproducer/security/WebSecurityConfig.java):
+
+- Any request has to be **authenticated**
+- [AuthenticationFilter](task2/metrics-producer/src/main/java/study/metricsproducer/security/AuthenticationFilter.java)
+  will delegate the extraction of the token to
+  the [AuthenticationService](task2/metrics-producer/src/main/java/study/metricsproducer/security/AuthenticationService.java)
+- AuthenticationService will extract the header (set up by ```app.security.api-key-header-name```) from the request and
+  check that it is equal to the value of the property ```app.security.api-key```
+- In case of **success** a new Authentication object (with **apiKey as principal**) will be created and set in the
+  SecurityContext
+- Otherwise, 403 will be returned on existing endpoints
 
 # Set up
 
-1. Start a Kafka broker on localhost:9092 with 
+1. Start a Kafka broker on localhost:9092 with
+
 ```bash
 docker compose up
 ```
@@ -22,21 +39,31 @@ docker compose up
 Make sure you have the following properties in the modules:
 
 [Consumer properties](/task2/metrics-consumer/src/main/resources/application.properties):
+
 - spring.kafka.bootstrap-servers=http://localhost:9092
 
 [Producer properties](/task2/metrics-producer/src/main/resources/application.properties):
+
 - spring.kafka.bootstrap-servers=http://localhost:9092
 - server.port=8081
-- management.endpoints.web.exposure.include=metrics - this is **necessary** to include the [MetricsEndpoint](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/metrics/MetricsEndpoint.html) in the actuator.
+- management.endpoints.web.exposure.include=metrics - this is **necessary** to include
+  the [MetricsEndpoint](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/metrics/MetricsEndpoint.html)
+  in the actuator.
 
-2. Run the [MetricsProducerApplication](/task2/metrics-producer/src/main/java/com/epam/metrics/MetricsProducerApplication.java) 
-and [MetricsConsumerApplication](/task2/metrics-consumer/src/main/java/com/epam/metrics/MetricsConsumerApplication.java) modules with the following commands:
+2. Run
+   the [MetricsProducerApplication](/task2/metrics-producer/src/main/java/com/epam/metrics/MetricsProducerApplication.java)
+   and [MetricsConsumerApplication](/task2/metrics-consumer/src/main/java/com/epam/metrics/MetricsConsumerApplication.java)
+   modules with the following commands:
+
 - Producer:
+
 ```bash
 cd metrics-producer
 mvn spring-boot:run
 ```
+
 - Consumer:
+
 ```bash
 cd metrics-consumer 
 mvn spring-boot:run
@@ -45,13 +72,15 @@ mvn spring-boot:run
 # Features
 
 ## GET
-- /metrics **➡** returns last measurement for each metric 
-- /metrics/{id} **➡** returns the measurements of the metric with the tag 'id' or 404. 
-Optionally you can add 'from' and 'to' query parameters as long values to filter the results by timestamp. 
+
+- /metrics **➡** returns last measurement for each metric
+- /metrics/{id} **➡** returns the measurements of the metric with the tag 'id' or 404.
+  Optionally you can add 'from' and 'to' query parameters as long values to filter the results by timestamp.
 
 ## POST
+
 - /metrics **➡** take an array of Metric objects **➡** the producer will publish the metrics to the Kafka topic.
-  - Body example:
+    - Body example:
   ```json
   [
     {
