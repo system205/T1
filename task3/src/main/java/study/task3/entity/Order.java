@@ -28,4 +28,13 @@ public class Order {
         DELIVERED,
         NOT_DELIVERED
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+            "id=" + id +
+            ", description='" + description + '\'' +
+            ", status=" + status +
+            '}';
+    }
 }

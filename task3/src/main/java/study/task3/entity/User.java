@@ -25,4 +25,14 @@ public class User {
         this.name = name;
         this.email = email;
     }
+
+    @Override
+    public String toString() {
+        return """
+            User{\
+                id=%d,\
+                name='%s',\
+                email='%s'\
+            }""".formatted(id, name, email);
+    }
 }
