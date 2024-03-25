@@ -1,11 +1,17 @@
 package study.task3.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue
@@ -14,4 +20,9 @@ public class User {
     private String email;
     @OneToMany
     private List<Order> orders;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }
