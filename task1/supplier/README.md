@@ -11,3 +11,8 @@ Run tests:
 ```shell
 ../mvnw test -Dtest=ProductsControllerTest
 ```
+
+Run all
+```shell
+../mvnw test
+```

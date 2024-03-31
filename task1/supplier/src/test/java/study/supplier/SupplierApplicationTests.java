@@ -32,12 +32,6 @@ public class SupplierApplicationTests {
         log.info("The postgres test container is started");
     }
 
-    @AfterAll
-    static void afterAll(){
-        log.info("The postgres test container is stopping");
-        postgreSQLContainer.stop();
-    }
-
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry){
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
