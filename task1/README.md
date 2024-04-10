@@ -1,3 +1,4 @@
+[![Super-Linter](https://github.com/<OWNER>/<REPOSITORY>/actions/workflows/lint.yaml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 # Solved homeworks for T1 school 2024
 
 ## Description
